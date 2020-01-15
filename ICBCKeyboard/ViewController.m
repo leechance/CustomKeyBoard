@@ -193,32 +193,7 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
 
 //登录按钮点击事件
 - (IBAction)loginBtnClick{
-    
-    if (!self.userNameField.text.length) {
-        [self.userNameField becomeFirstResponder];
-        [self shakeAnimation:self.userNameField];
-    }else if (self.userNameField.text.length && !self.passwordField.text.length){
-        [self.passwordField becomeFirstResponder];
-        [self shakeAnimation:self.passwordField];
-    }else if ([self.userNameField.text isEqualToString:@"15262352648"] && [self.passwordField.text isEqualToString:@"omni3344"]){
-        [self.view endEditing:YES];
-        self.actIndicator.hidden=NO;
-        [self.actIndicator startAnimating];
-        [self.loginBtn setTitle:@"正在载入……" forState:UIControlStateNormal];
-        //模拟登录成功
-        [self performSelector:@selector(stopAnimation) withObject:nil afterDelay:1.5];
-    }else{
-        [self.view endEditing:YES];
-        [self.actIndicator startAnimating];
-        [self.loginBtn setTitle:@"正在载入……" forState:UIControlStateNormal];
-        CSToastStyle *style=[[CSToastStyle alloc]initWithDefaultStyle];
-        style.messageFont=[UIFont systemFontOfSize:15];
-        style.maxWidthPercentage=0.8;
-        style.fadeDuration=1.5;
-        //模拟登录成败
-        [self.view makeToast:@"用户名或密码错误，请认真核实后重新输入。" duration:1.5 position:@"CSToastPositionCenter" style:style];
-        
-    }
+   
 }
 
 -(void)stopAnimation{

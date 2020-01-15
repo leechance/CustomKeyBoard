@@ -31,6 +31,10 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
 
 
 @implementation LDDKeyboardView
+{
+    NSMutableArray*_signArray;//字母数字
+    NSMutableArray*_charArray;
+}
 
 -(void)awakeFromNib{
     
@@ -60,8 +64,51 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
     for (UIView *subView in self.inputView.subviews) {
         [self setupButtonClickWithView:subView];
     }
+    [self getCharArray];
+    [self getSignArray];
+    
+//    [self generateRandomChar];
+//    [self generateRandomSign];
+    
     
 }
+-(void)getSignArray{
+    _signArray=[NSMutableArray array];
+  
+    [self.signView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[UIButton class]]) {
+            UIButton *button=(UIButton*)obj;
+                  if (button.tag!=LDDButtonTypeLogin && button.tag!=LDDButtonTypeDelete&&
+                      button.tag!=LDDButtonTypeShift&&
+                      button.tag!=LDDButtonTypeSpace) {
+                      [_signArray addObject:button.currentTitle];
+                  }
+        }
+     
+    }];
+    
+    
+    
+}
+-(void)getCharArray{
+    _charArray=[NSMutableArray array];
+ 
+    [self.charView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[UIButton class]]) {
+            UIButton *button=(UIButton*)obj;
+                  if (button.tag!=LDDButtonTypeLogin && button.tag!=LDDButtonTypeDelete&&
+                      button.tag!=LDDButtonTypeShift&&
+                      button.tag!=LDDButtonTypeSpace) {
+                      [_charArray addObject:button.currentTitle];
+                  }
+        }
+     
+    }];
+    
+    
+    
+}
+
 
 
 //键盘类型按钮点击事件
@@ -79,17 +126,21 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
         case LDDButtonTypeChar:
             self.leftConstraint.constant=0;//改变char键盘距离父视图左边的约束条件
             [self generateRandomNumber];//点击数字按钮时更新键盘数字
+             [self generateRandomSign];
             break;
             
         case LDDButtonTypeNumber:
             self.leftConstraint.constant=kScreenW;
             [self lowercaseString];
+            [self generateRandomChar];
+            [self generateRandomSign];
             break;
             
         case LDDButtonTypeSign:
             [self generateRandomNumber];
             self.leftConstraint.constant=-kScreenW;
             [self lowercaseString];
+            [self generateRandomChar];
             break;
     }
 }
@@ -162,9 +213,67 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
                 [button setTitle:number.stringValue forState:UIControlStateNormal];
             }
         }];
+        
+        index=0;
+    }
+    
+}
+//字符键盘产生随机
+-(void)generateRandomChar{
+    
+   // NSArray *randomArr=_charArray;
+    NSArray *randomArr=[self randomChar];
+    UIButton *numberTypeBtn=(UIButton*)[self.accessoryView viewWithTag:LDDButtonTypeNumber];
+    UIButton *signTypeBtn=(UIButton*)[self.accessoryView viewWithTag:LDDButtonTypeSign];
+    
+    if (numberTypeBtn.selected || signTypeBtn.selected) {
+        __block NSInteger index=0;
+        [self.charView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[CYRKeyboardButton class]]) {
+                CYRKeyboardButton *button=(CYRKeyboardButton*)obj;
+                       if (button.tag!=LDDButtonTypeLogin && button.tag!=LDDButtonTypeDelete&&
+                           button.tag!=LDDButtonTypeShift&&
+                            button.tag!=LDDButtonTypeSpace) {
+                           NSString *charString=randomArr[index++];
+                           [button setTitle:charString forState:UIControlStateNormal];
+                           button.input=button.currentTitle;
+
+                       }
+            }
+       
+        }];
+        [self.charView setNeedsDisplay];
+        index=0;
+    }
+    
+}
+//字母键盘产生随机
+-(void)generateRandomSign{
+    
+   // NSArray *randomArr=_charArray;
+    NSArray *randomArr=[self randomSign];
+    UIButton *numberTypeBtn=(UIButton*)[self.accessoryView viewWithTag:LDDButtonTypeNumber];
+    UIButton *charTypeBtn=(UIButton*)[self.accessoryView viewWithTag:LDDButtonTypeChar];
+    
+    if (numberTypeBtn.selected || charTypeBtn.selected) {
+        __block NSInteger index=0;
+        [self.signView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[CYRKeyboardButton class]]) {
+                CYRKeyboardButton *button=(CYRKeyboardButton*)obj;
+                       if (button.tag!=LDDButtonTypeLogin && button.tag!=LDDButtonTypeDelete&&
+                           button.tag!=LDDButtonTypeShift&&
+                           button.tag!=LDDButtonTypeSpace) {
+                           NSString *signString=randomArr[index++];
+                           [button setTitle:signString forState:UIControlStateNormal];
+                           button.input=button.currentTitle;
+                       }
+            }
+       
+        }];
+         [self.signView setNeedsDisplay];
+        index=0;
     }
 }
-
 //产生任意范围内任意数量的随机数(使用此方法)
 -(NSArray*)randomDataFromLower:(NSInteger)lower
                       toHigher:(NSInteger)higher
@@ -200,6 +309,34 @@ typedef NS_ENUM(NSUInteger,LDDButtonType) {
     return tmpArr;
     
 }
+
+-(NSArray*)randomChar{
+    NSMutableArray *numberArr=[NSMutableArray arrayWithArray:_charArray];
+    NSInteger numberCount=numberArr.count;
+    NSMutableArray *tmpArr=[NSMutableArray array];
+    for (NSInteger i=0; i<numberCount; i++) {
+        NSString *number=numberArr[arc4random() % numberArr.count];
+        [tmpArr addObject:number];
+        [numberArr removeObject:number];
+    }
+    
+    return tmpArr;
+    
+}
+-(NSArray*)randomSign{
+    NSMutableArray *numberArr=[NSMutableArray arrayWithArray:_signArray];
+    NSInteger numberCount=numberArr.count;
+    NSMutableArray *tmpArr=[NSMutableArray array];
+    for (NSInteger i=0; i<numberCount; i++) {
+        NSString *number=numberArr[arc4random() % numberArr.count];
+        [tmpArr addObject:number];
+        [numberArr removeObject:number];
+    }
+    
+    return tmpArr;
+    
+}
+
 
 +(instancetype)loadKeyboardFromNib{
     
