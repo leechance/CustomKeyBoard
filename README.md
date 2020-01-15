@@ -21,10 +21,12 @@
 
 ◉点击键盘按钮，放大显示动画
 
-### 简书地址：
-[简书地址] ( http://www.jianshu.com/p/df4d57bcd2b8 )
+◉数字，键盘，还有字符实现随机化
 
-### 键盘示意图：
-![image](https://github.com/dongdong3344/CustomKeyBoard/blob/master/%E4%B8%8B%E8%BD%BD.gif)
+遗留问题：
+字符少了只支持英文，因为是为密码框设计，所以没有考虑中文字符
+
+### 原始代码地址：
+[简书地址] (https://github.com/dongdong3344/CustomKeyBoard/)
 
 
